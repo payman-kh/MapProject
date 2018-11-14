@@ -1,0 +1,62 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-color: black;
+}
+
+
+
+.div.btn-group {
+  position: relative;
+  padding: relative;
+  left: 100px;
+  border: 3px solid #73AD21;
+}
+
+.main_search[type=text] {
+    width: 360px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-image: url('https://cdn3.iconfinder.com/data/icons/linecons-free-vector-icons-pack/32/search-24.png');
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+.main_search[type=text]:focus {
+    width: 50%;
+}
+
+.navbar{
+  border-radius: 0;
+  background-color: MidnightBlue;
+  border-color: white;
+}
+
+
+.navbar-brand{
+  /*background-color: yellow;*/
+  font-family: 'Courgette', cursive;
+  /*text-shadow: 1px 1px black;*/
+}
+.navbar-brand:hover{
+  /*background-color: white;*/
+}
+
+.navbar-collapse{
+   color: white;
+}
+.navbar-collapse:hover{
+   color: yellow;
+}

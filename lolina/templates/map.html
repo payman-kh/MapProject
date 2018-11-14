@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block title %} Mapster {% endblock %}
+
+{% block body %}
+<html>
+<head>
+  {% load static %}
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta http-equiv="X-UA-Compatible" content="ie=edge">
+ <!-- javascript files -->
+ <script type="text/javascript" src="{% static 'js/setCSRF.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/saveMarker.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/refresh_markers.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/display_markers.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/geocoder.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/update_profile.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/closeAll.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/addMarkerToCurrentLocation.js' %}"></script>
+ <!--<script type="text/javascript" src="{% static 'js/shareMarker.js' %}"></script>-->
+ <script type="text/javascript" src="{% static 'js/drawCircle.js' %}"></script>
+
+ <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+ <!-- jquery -->
+ <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ <!--<script type="text/javascript" src="{% static 'js/search_place.js' %}"></script>-->
+ <!-- font awesome -->
+ <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+</head>
+
+<body>
+  <!-- where the map goes -->
+  <div id="map" height="460px" width="100%"></div>
+
+  {% if messages %}
+  <!-- saying congrates to new a user. but does not work this way-->
+  <!--  <body onload="congrates()"> -->
+  {% endif %}
+
+  <!-- storing the context variables for first time load (they are read only once!)-->
+  <div style="display:none">
+     <meta name="markers_from_database" id="markers_from_database" data-name="{{markers_json}}">
+     <meta name="user_names" id="user_names" data-name="{{user_names}}">
+     <meta name="image_urls" id="image_urls" data-name="{{image_urls}}">
+     <meta name="min_datetime" id="min_datetime" data-name="{{min_datetime}}">
+     <meta name="max_datetime" id="max_datetime" data-name="{{max_datetime}}">
+     <meta name="number" id="number" data-name="{{number}}">
+  </div>
+
+  <!-- marker option menu -->
+  <div id="marker_options_menu" style="display:none">
+    <form id="options_menu_form" method="post" data-url="{{ request.build_absolute_uri}}">
+      <ul class="list-group">
+        <li><a href="#" onclick="add_marker()" class="list-geoup-item"> add Marker </a></li>
+        <li role="separator" ></li>
+        <li><a href="#" list="list-group-item"> add Route </a></li>
+        <li role="separator" ></li>
+        <li><a href="#" list="list-group-item"> add something else </a></li>
+      </ul>
+    </form>
+  </div>
+
+
+  <!-- add-new-marker form-->
+  <div id="iw-add_marker" style="display: none">
+    <form id="add_marker_form" method="post" data-url="{{ request.build_absolute_uri|safe }}" >
+      {% csrf_token %}
+      {{ form.as_p }}
+      <fieldset>
+         <legend><b>Post a new Marker!</legend>
+         title*: </b><input id="marker_title" type="text" size="45" placeholder="No Umlauts!" required><br><br>
+         <textarea name="body" id="body" rows="15" cols="50" placeholder="No Umlauts!"></textarea><br>
+         <div style="float:left;">
+           <b>youtube link: </b><input id="youtube_url" type="text" size="37">
+         </div><br><br>
+         <div title="upload image or video" style="float:left;">
+           <input id="uploaded_files" type="file" name="file" accept="image/*,video/*"> <!--  -->
+         </div>
+         <br><br>
+         <div id="add_marker_btns" style="float:left;">
+           <button type="submit" class="btn" style="background-color:DodgerBlue; color:white">save</button>
+           <button type="button" class="btn" onclick="temp_marker.setMap(null);" style="background-color:Lavender; border:1px Solid Thistle;">cancel</button>
+         </div>
+      </fieldset>
+    </form>
+  </div>
+
+
+    <!-- geocode panel -->
+    <div class="geo-panel">
+      <input id="geo-address" type="textbox" placeholder=" Enter Address...">
+      <b>  <button id="geo-submit"  type="submit"> go! </button> </b>
+    </div>
+
+    <!-- search places -->
+    <div id="search_places" class="controls search-place">
+      <input id="pac-input" type="textbox" placeholder="Search Places">
+    </div>
+
+    <!-- navigate panel -->
+    <b>
+    <div class="navigate-panel">
+      <form id="navigate_newer">
+        <button  type="submit" class="navigate-btn"> Next </button>
+        <input  id="newer_value" class="navigate-quantity" type=input value=1>
+      </form>
+      <form id="navigate_older">
+        <button type="submit" class="navigate-btn"> Prev </button>
+        <input id="older_value" class="navigate-quantity" type=input value=1>
+      </form>
+    </div>
+  </b>
+
+  <!-- profile section -->
+  <!-------------------------------------------------------------------------->
+  <b>
+    <div id="profile_section"  class="profile_section" style="display:none;">
+      <h3 id="profile_name_tag" data-name="{{user.username}}"></h3>
+      <button id="profile_edit_btn" class="modal-btn" data-modal="modal1"><i class="material-icons">border_color</i></button>
+      {% if user.profile.image.url %}
+          <br><img src="" data-name="{{user.profile.image.url}}" class="img-circle" id="profile_picture">
+      {% endif %}
+    <br><div align="center"><button class="btn btn-default" id="follow_button" style="display:none;"> follow </button></div>
+    </div>
+  </b>
+
+  <!-- profile modal window -->
+  <div id="modal1" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" style="width:50%">
+      <span class="close">&times;</span>
+      <form id="profile_edit_form" method="POST" enctype="multipart/form-data">
+         {% csrf_token %}
+         <fieldset class="form-group">
+           <legend class="border-bottom mb4"> Profile Info </legend>
+             {% include 'profile_edit_window.html' %}
+         </fieldset>
+         <button class="btn btn-outline-info " type="submit"> Update Info </button>
+       </form>
+    </div>
+  </div>
+  <!-------------------------------------------------------------------------->
+  <!-- top middle controls -->                                                                                                                         <!--TODO: fix this centering problem -->
+  <div id="top_middle_controls" class="" align="center" role="toolbar"  style="user-select:none; display:table; z-index:5; width:50%; margin:0 auto; position:absolute; left:310px; top:60px;">
+    <button id="add_to_current_location" onclick="addMarkerToCurrentLocation()" class="btn btn-default"  title="add marker to your current location (might not always work!)" tabindex="0" style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;"><span class="glyphicon glyphicon-arrow-down"></span></button>
+    <button id="add route" class="btn btn-default" onclick="drawCircle()" title="draw circle" style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;"><i class="far fa-circle"></i></button>
+  </div>
+
+  <!-- drawing tools --->
+
+<!----------------------------------------------------------------------------->
+  <!-- search results modal window -->
+  <div id="modal2" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" style="width:25%">
+      <span class="close">&times;</span>
+        <div id="search_results" class="container">
+              <div class="row">
+                  <div class="col-xs-12">
+                      <ul class="list-group"></ul>
+                  </div>
+              </div>
+        </div>
+    </div>
+  </div>
+  <!----------------------------------------------------------------------->
+  <!-- the sidenav window for ads -->
+  <div class="sidenav">
+    <div id='rightSide'>
+      <p style="color:black; font-family:Oswald; text-align:center"> Ads </p>
+      <img src="https://lh3.googleusercontent.com/JOzr43ZJZ2yok5XzpagbKZsiu9UW6SSyZZj1FaCwyk0gucdPR07sBKqpl3vfi-e6Bd5GhPBYgomo5iNkG2u6v2k1VYNC2KdlR7khXCgmXHlDbKliHoFXz6LVIseXwRnlNXbizuUxCsPfaERgVhuW1luGMWrbclmyzWaKxQdukXlAxL_Ni_NYhN6qsN1dPxGTZ-ZAXejV86828B6_wtmWk4MhnGiS7dCmNfqtegXPRZtf032fYjyzIc9as3IqcAYNF6Suoikc2XLPPz6XbnQeoHUHaV9R-FpI6WmOr3hbJWZiK-uWNgdwOw2hZKr5IzCBb2v0O7LQT_XVKtcs2o8laO8JXSMIZ0YnEdr2q7yNwVpzCX1e-f0cLsgAFd_lWEDydeW8Ka6Bnkij5iLYZWE1BOAqNFA4n7V1q_U_2PCJNf8ZzYh9R0hymJUVEuiytf7ak1raZNrPqKpMyowUW6aol5E8xTlpmFzRYoNkpSo2mTX6mVSVH5iwAIpLfOB8gnLklAJ0GBgYlo0FhKhiMRuUT6tN0QZ_-lbZsVun0EjEVRkMklnaxI0Z48DuvrEOiwuQ63o3nBiXdhroa-DFMucZAdBpLG1exNZFWb4wf9Y=w300-h382-no" alt="image" class="center" width="300">
+      <br>
+      <p style="color:black; font-family:Oswald; text-align:center"> Ads </p>
+      <img src="https://lh3.googleusercontent.com/X8eSUU8CyGDGtCHONfKZXOzFyym39gLqPSM-E1zQjr-ozfO3jsL49pTpTe91PtgT6Mly8sNLhpOPc8-HXxWFXwmyozSTE6hnnTlJeQVu8POwl4ECnFkHB7HX4bzWJy9q0lZWQmAMI020pVR9H7fd6k2W2Vipc4cN8VibsuTQFpQvcL2oq-CpXadfkq5P8OdYoGicYb3As6U60whHoh2MfwOPbe3-4EdbZYy-fnQvdam4Uy6epE4I6nArtzrgchCTjPPQY5x0YHXBxjCHbKCkVKpEze2KdMoEfL6-jc8rWX7DGMz58M6RKpoGmR0dzfS_vJOFzxxpULG8abegth-OjQRSiGyOujP29Kktcnw3DgcjoXFa1TUKKk1kzGsRig2am5PL6Eg2Fj4T09hYIdEVBJewQW_-NMZA4zDyaSy3DfWvorHxy2ha0SWUv40Rp19XBE-AseKTkOgLQzXbnzNUps1eGURRMNyCIvY6xzGDHue9wbdlF4ENYLnuqwEBugKOEWLGV0A0LNIlK0HsV0VSyBdrvn3bCT0On77OR5VT42mv2elnJe_jVOrpjmd6L0jN3KSetKbpdTpl635RFK8v1r0AnJE_8Vgwf9Y6NYw=w300-h382-no" alt="image" class="center" width="300">
+     </div>
+    <div id='click'><button id="click_button"> << </button></div>
+  </div>
+  <!------------------------------------------------------------------------>
+
+<script>
+//---------------------------- INITIALIZE THE MAP ------------------------------
+var map;
+var temp_marker = null;
+var lat, lng;
+var markers = new Array();
+var counter = 0;
+var new_min_datetime, new_max_datetime;
+var is_query = false;
+var on_profile = false;
+var UserName = false;
+var place_markers = [];
+var directionsDisplay, directionsService; //varibales for route (navigation)
+var marker_location;
+var was_there = false;
+var drawingManager = [];
+var infowindow_content_2
+
+function initMap(){
+
+  //TODO: infowindow rounded corners (not working)
+   /*var iwOuter = $('.gm-style-iw');
+   var iwBackground = iwOuter.prev();
+   iwBackground.children(':nth-child(4)').css("border-radius: 10px 10px 10px 10px");*/
+
+ // defining the map
+  var centerCoords = new google.maps.LatLng(37.2071, 50.0034);
+  var options = {
+    zoom: 8,
+    center:centerCoords,
+    mapTypeId: google.maps.MapTypeId.TERRAIN,    // satellite, hybrid, terrain, roadmap
+    disableDefaultUI: true,
+    zoomControl: true,
+    mapTypeControl: true,
+  }
+
+  //the map instance
+  map = new google.maps.Map(document.getElementById('map'), options);
+
+
+  // base directory of icon markers
+  //var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
+
+  // blue marker:
+  var marker_icon = new google.maps.MarkerImage("http://maps.google.com/mapfiles/ms/micons/blue.png",
+             new google.maps.Size(32, 32), new google.maps.Point(0, 0),new google.maps.Point(16, 32));
+  //blue marekr used in engines.google.com:
+  //https://mt.google.com/vt/icon/name=icons/onion/SHARED-mymaps-pin-container-bg_4x.png,icons/onion/SHARED-mymaps-pin-container_4x.png,icons/onion/1899-blank-shape_pin_4x.png&amp;highlight=ff000000,0288D1,ff000000&amp;scale=2.0
+
+
+//-----------------------------------------------------------------------------
+ // Listener for per-click markers:
+  google.maps.event.addListener(map, 'dblclick', function(event) {
+
+    //close markers / routes and anything on the map
+    closeAll();
+    was_there = false;
+
+    temp_marker = new google.maps.Marker({
+      map: map,
+      position: event.latLng,
+      icon: 'https://maps.google.com/mapfiles/kml/shapes/' + 'flag_maps.png',
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+    });
+
+
+    var form_2 =	$("#options_menu_form").clone().show();
+    infowindow_content_2 = form_2[0];
+    temp_marker.newWindow = new google.maps.InfoWindow({
+      content: infowindow_content_2
+    })
+
+    temp_marker.newWindow.open(map, temp_marker);
+
+   // Listener for window close:
+   google.maps.event.addListener(temp_marker.newWindow,'closeclick',function(){
+     temp_marker.setMap(null);
+   });
+
+ }); // per-click listener
+//-----------------------------------------------------------------------------
+// load the homepage and dislplay the most recent markers
+ let markers_from_database_raw = $("#markers_from_database").data();
+ var markers_from_database = markers_from_database_raw['name']
+ let number_raw = $("#number").data();
+ var number = number_raw['name']
+ let user_names_raw = $('#user_names').data();
+ var user_names = user_names_raw['name']
+ let image_urls_raw = $('#image_urls').data();
+ var image_urls = image_urls_raw['name']
+ readNDisplayMarkers(markers_from_database, number, user_names, image_urls);
+//------------------------------------------------------------------------------
+ // listner for geocoder click (navigate to address)
+ var geocoder = new google.maps.Geocoder();
+ document.getElementById('geo-submit').addEventListener('click', function() {
+   geocodeAddress(geocoder, map);
+ });
+//------------------------------------------------------------------------------
+//SEARCH FOR PLACES
+ // link the search box to the UI element.
+ var input = document.getElementById('pac-input');
+ var searchBox = new google.maps.places.SearchBox(input);
+ //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input); //what does this do?
+
+ // Bias the SearchBox results towards current map's viewport.
+ map.addListener('bounds_changed', function() {
+  searchBox.setBounds(map.getBounds());
+ });
+
+ // Listen for the event fired when the user selects a prediction and retrieve
+ // more details for that place.
+ searchBox.addListener('places_changed', function() {
+  var places = searchBox.getPlaces();
+
+  if (places.length == 0) {
+    return;
+  }
+
+  // Clear out the old markers.
+  closeAll();
+  place_markers = [];
+
+  // For each place, get the icon, name and location.
+  var bounds = new google.maps.LatLngBounds();
+  places.forEach(function(place) {
+    if (!place.geometry) {
+      console.log("Returned place contains no geometry");
+      return;
+    }
+    var icon = {
+      url: place.icon,
+      size: new google.maps.Size(71, 71),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      scaledSize: new google.maps.Size(25, 25)
+    };
+
+    // Create a marker for each place.
+    place_markers.push(new google.maps.Marker({
+      map: map,
+      icon: icon,
+      title: place.name,
+      position: place.geometry.location
+    }));
+
+    if (place.geometry.viewport) {
+      // Only geocodes have viewport.
+      bounds.union(place.geometry.viewport);
+    } else {
+      bounds.extend(place.geometry.location);
+    }
+  });
+   //map.fitBounds(bounds);
+
+});
+// end search for places
+//------------------------------------------------------------------------------
+// ads side nav animation
+$('#click').click(function(){
+   $("#rightSide").animate({width:'toggle'},500);
+});
+//------------------------------------------------------------------------------
+/* managing "profile edit" and "search results" modal windows */
+//open the window
+$('.modal-btn').on('click', function(){
+  $('#'+$(this).data('modal')).css('display','block');
+  $(".geo-panel").hide();
+  $("#search_places").hide();
+  $(".navigate-panel").hide();
+  $(".profile_section").hide();
+})
+
+
+$('.close').on('click', function(){
+  $('.modal').hide();
+  $(".geo-panel").show();
+  $("#search_places").show();
+  $(".navigate-panel").show();
+  if (on_profile){
+    $(".profile_section").show();
+  }
+  is_query = false;
+})
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target.className == 'modal') {
+    $('.modal').hide();
+    $(".geo-panel").show();
+    $("#search_places").show();
+    $(".navigate-panel").show();
+    if (on_profile){
+      $(".profile_section").show();
+    }
+    is_query = false;
+  }
+}
+/* end of modal windows */
+
+} //initMap
+//-----------------------------------------------------------------------------
+function congrates(){
+  alert("your acount was successfully created!");
+}
+//-----------------------------------------------------------------------------
+function add_marker(){
+
+  temp_marker.newWindow.close();
+
+  var form_1 =	$("#iw-add_marker").clone().show();
+  var infowindow_content_1 = form_1[0];
+  temp_marker.add_marker_window = new google.maps.InfoWindow({
+    content: infowindow_content_1
+  });
+
+  temp_marker.add_marker_window.open(map, temp_marker);
+  //temp_marker.newWindow.setStyle("background-color: yellow");
+
+ // Listener for window close:
+ google.maps.event.addListener(temp_marker.add_marker_window,'closeclick',function(){
+   temp_marker.setMap(null);
+ });
+}
+//------------------------------------------------------------------------------
+
+</script>
+
+<!-- GOOGLE MAPS API and the libraries: places & drawing -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPKiyS-x_XMwT7WBszAoq4w9W2-g_zxSo&callback=initMap&libraries=places,drawing">
+</script>
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,9 @@
+#login_form_div{
+  background-color: #00CED1;
+  border-radius: 4px;
+  width: 35%;
+  height: auto;
+  display: inline-block;
+  vertical-align:top;
+  margin-top:60px;
+}
