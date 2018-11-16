@@ -42,6 +42,9 @@ urlpatterns = [
     path('saveMarker1/', views.SaveMarker1, name='SaveMarker1'),
     path('saveMarker2/', views.SaveMarker2, name='SaveMarker2'),
 
+    # delete a marker
+    path('deleteMarker/', views.deleteMarker, name='DeleteMarker'),
+
     # getting the latest marker after map loads:
     url(r'^get_latest_markers/$', views.get_latest_markers, name='get_latest_markers'),
 

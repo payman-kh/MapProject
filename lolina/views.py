@@ -30,8 +30,8 @@ def set_home_page_variables(posts, number=1, ):
         datetimes  = [ d['dateNtime'] for d in posts_list ]
         min_datetime = str(min(datetimes))
         max_datetime = str(max(datetimes))
-        min_datetime_json =  json.dumps(min_datetime, cls=DjangoJSONEncoder)
-        max_datetime_json =  json.dumps(max_datetime, cls=DjangoJSONEncoder)
+        min_datetime_json = json.dumps(min_datetime, cls=DjangoJSONEncoder)
+        max_datetime_json = json.dumps(max_datetime, cls=DjangoJSONEncoder)
 
         home_page_dict = {'markers_json': markers_json,
                           'user_names'  : user_names_json,
@@ -144,8 +144,6 @@ def SaveMarker1(request):
 
 def SaveMarker2(request):
     """" adds image/video to the object that was just made above """
-    #TODO: it is unstable and error prone to simply get the last one. we need a
-    # way to look for the associated object more precisely
     last_post_by_user = Post.objects.filter(user=request.user).last()
     last_post_by_user.attachment = request.FILES['attachment']
     last_post_by_user.save()
@@ -156,6 +154,15 @@ def SaveMarker2(request):
     return JsonResponse(home_page_vars)
 ################################################################################
 
+def deleteMarker(request):
+    user = request.user
+    date = request.POST.get('date')
+    post = Post.objects.filter(dateNtime__gte=date, user=user).first()
+    post.delete()
+
+    user_posts = user.post_set.order_by('-dateNtime')[:1]
+    user_posts = set_home_page_variables(user_posts)
+    return JsonResponse(user_posts)
 
 # no searching for posts at the moment!
 """def first_results(requests):

@@ -40,7 +40,6 @@ def profile(request):
         user = User.objects.get(username=username)
 
     user_posts = user.post_set.order_by('-dateNtime')[:1]
-    print(user_posts.values())
     user_posts = set_home_page_variables(user_posts)
     return JsonResponse(user_posts)
 
