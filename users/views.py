@@ -13,7 +13,6 @@ from urllib.parse import unquote
 import time
 
 
-
 def signup(request):
     if not request.user.is_authenticated:
         if request.method == 'POST':
@@ -89,13 +88,11 @@ def update_profile_image(request):
             return HttpResponse('None')
 ###############################################################################
 
-
 @login_required
 def get_user_profile_picture(request):
     """ fetch profile picture of another user """
     username = request.POST.get('username')
     user = User.objects.get(username=username)
-
     return JsonResponse({'profile_picture': user.profile.image.url})
 
 
@@ -131,3 +128,11 @@ def navigate_profile(request):
     else:
         user_posts = set_home_page_variables(posts, number)
     return JsonResponse(user_posts)
+
+
+@login_required
+def deleteAccount(request):
+    user = request.user
+    user = User.objects.filter(username=user.username, email=user.email)
+    user.delete()
+    return redirect('logout')

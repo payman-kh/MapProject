@@ -7,15 +7,18 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
+    # admin page
     url(r'^admin/', admin.site.urls),
 
-    # sign-up page:
+    # sign-up page
     path('', user_views.signup, name='signup'),
     # login and logout
     path('login/', auth_views.LoginView.as_view(template_name='login.html',
                                                 redirect_authenticated_user=True),
                                                 name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
+    # delete Account
+    path('deleteAccount/', user_views.deleteAccount, name="DeleteAccount"),
 
     #  home"page":
     url(r'^homepage/', views.homepage, name='homepage'),
@@ -32,6 +35,7 @@ urlpatterns = [
     path('users/navigate_profile/', user_views.navigate_profile, name='navigate_profile'),
     # another users's profile picture
     path('users/user_profile_picture/', user_views.get_user_profile_picture, name='user_profile_picture'),
+
 
     # search function: (users)
     path('search/', views.Search, name='Search'),
