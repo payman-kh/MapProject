@@ -76,7 +76,7 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
               main_content =
                     '<h1><img src="'+ img_url +'" title="'+ user_name +'" width=30px; width=30px; class="img-circle" style="object-fit: contain;">&nbsp;'
                      + curr_marker.title + '</h1>' +
-                      '<br><br>' + ( typeof curr_marker.body !="undefined" ? '<div id=marker_body" style="word-wrap: break-word; width:550px;"><h4>' + curr_marker.body + '</h4></div>':'null') +
+                      '<br><br>' + ( typeof curr_marker.body !="undefined" ? '<div id=marker_body" style="word-wrap: break-word; width:550px;"><h4>&nbsp; &nbsp;' + curr_marker.body + '</h4></div>':'null') +
                       '<img class="marker_main_image" src="'+ '/media/' + curr_marker.attachment +'" alt="could not load image" width=540px; height=340px;>';
 
             }else if (file_type == 'video'){
@@ -93,7 +93,7 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
               main_content =
                     '<h1><img src="'+ img_url +'" title="'+ user_name +'" width=30px; width=30px; class="img-circle" style="object-fit: contain;">&nbsp;'
                     +  curr_marker.title + '</h1>' +
-                    '<br><br>' + ( typeof curr_marker.body !="undefined" ? '<div style="width:550px"><h4>' + curr_marker.body + '</h4></div>':'null') +
+                    '<br><br>' + ( typeof curr_marker.body !="undefined" ? '<div style="width:550px"><h4>&nbsp; &nbsp;' + curr_marker.body + '</h4></div>':'null') +
                     '<video id="marker_main_video" width=540px; height=340px; controls>' +
                       '<source src="' + '/media/' + curr_marker.attachment + '" type="video/' + format + '">' +
                       'Your browser does not support the video tag' +
@@ -131,7 +131,7 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
                             '<button id="share_button" class="btn btn-default" type="button" onclick="" title="share (inactive)"><span class="glyphicon glyphicon-share-alt"></span></button>&nbsp' +
                             '<button id="get_directions" class="btn btn-default" type="button" onclick="get_directions()" title="get directions"> <i class="material-icons" style="font-size:27px;color:red">place</i> </button> &nbsp' +
                             (on_profile == true ? '<button id="delete_marker" class="btn btn-default" type="button" onclick="deleteMarker('+ dateNtimes[m] +')" title="delete this marker" style="background-color:Lavender; border:1px Solid black;"><span class="glyphicon glyphicon-trash"></span></button>':"") +
-                            '<br><input id="new_comment" class="new_comment" type=input placeholder="write a comment...">' +
+                            '<br><input id="new_comment" title="inactive" class="new_comment" type=input placeholder="write a comment...">' +
                           '</div>';
                           //'<br> <strong> Coordinates:&nbsp; </strong>' + lat + '<strong>,&nbsp;</strong> ' + lng + '<br><br>'
 
