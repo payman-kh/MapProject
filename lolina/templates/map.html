@@ -18,6 +18,7 @@
  <script type="text/javascript" src="{% static 'js/update_profile.js' %}"></script>
  <script type="text/javascript" src="{% static 'js/closeAll.js' %}"></script>
  <script type="text/javascript" src="{% static 'js/addMarkerToCurrentLocation.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/likeMarker.js' %}"></script>
  <!--<script type="text/javascript" src="{% static 'js/drawCircle.js' %}"></script>-->
  <!--<script type="text/javascript" src="{% static 'js/shareMarker.js' %}"></script>-->
 
@@ -43,6 +44,9 @@
      <meta name="markers_from_database" id="markers_from_database" data-name="{{markers_json}}">
      <meta name="user_names" id="user_names" data-name="{{user_names}}">
      <meta name="image_urls" id="image_urls" data-name="{{image_urls}}">
+     <meta name="ids" id="ids" data-name="{{ids}}">
+     <meta name="num_likes" id="num_likes" data-name="{{num_likes}}">
+     <meta name="liked" id="liked" data-name="{{liked}}">     
      <meta name="min_datetime" id="min_datetime" data-name="{{min_datetime}}">
      <meta name="max_datetime" id="max_datetime" data-name="{{max_datetime}}">
      <meta name="number" id="number" data-name="{{number}}">
@@ -269,9 +273,15 @@ function initMap(){
  var user_names = user_names_raw['name']
  let image_urls_raw = $('#image_urls').data();
  var image_urls = image_urls_raw['name']
- readNDisplayMarkers(markers_from_database, number, user_names, image_urls);
+ let ids_raw = $('#ids').data();
+ var ids = ids_raw['name']
+ let num_likes_raw = $('#num_likes').data();
+ var num_likes = num_likes_raw['name']
+ let liked_raw = $('#liked').data();
+ var liked = liked_raw['name']
+ readNDisplayMarkers(markers_from_database, number, user_names, image_urls, ids, num_likes, liked);
 //------------------------------------------------------------------------------
- // listner for geocoder click (navigate to address)
+ // listener for geocoder click (navigate to address)
  var geocoder = new google.maps.Geocoder();
  document.getElementById('geo-submit').addEventListener('click', function() {
    geocodeAddress(geocoder, map);

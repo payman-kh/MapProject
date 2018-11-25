@@ -36,16 +36,16 @@ urlpatterns = [
     # another users's profile picture
     path('users/user_profile_picture/', user_views.get_user_profile_picture, name='user_profile_picture'),
 
-
     # search function: (users)
     path('search/', views.Search, name='Search'),
     #url(r'^first_results/$', views.first_results, name='first_results'),
     #url(r'^next_results/$', views.next_results, name='next_results'),
 
-    # save a new marker:
+    # save a new marker
     path('saveMarker1/', views.SaveMarker1, name='SaveMarker1'),
     path('saveMarker2/', views.SaveMarker2, name='SaveMarker2'),
-
+    # like a marker
+    path('likeMarker/', views.likeMarker, name='LikeMarker'),
     # delete a marker
     path('deleteMarker/', views.deleteMarker, name='DeleteMarker'),
 

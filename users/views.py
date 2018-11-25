@@ -39,7 +39,7 @@ def profile(request):
         user = User.objects.get(username=username)
 
     user_posts = user.post_set.order_by('-dateNtime')[:1]
-    user_posts = set_home_page_variables(user_posts)
+    user_posts = set_home_page_variables(user_posts, request.user)
     return JsonResponse(user_posts)
 
 
@@ -124,9 +124,9 @@ def navigate_profile(request):
             posts = Post.objects.filter(dateNtime__gte=date, user=user).order_by('dateNtime')[:2]
 
     if number == 1:
-        user_posts = set_home_page_variables(posts,1)
+        user_posts = set_home_page_variables(posts, request.user, 1)
     else:
-        user_posts = set_home_page_variables(posts, number)
+        user_posts = set_home_page_variables(posts, request.user, number)
     return JsonResponse(user_posts)
 
 

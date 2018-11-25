@@ -1,30 +1,45 @@
 from django.shortcuts import render , redirect
 from django.http import JsonResponse, HttpResponse
-from .models import Post #, SearchQueries
+from .models import Post , Like #, SearchQueries
 #from users.models import Profile
 from django.contrib.auth.models import User
 import json
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from datetime import datetime
-import requests
+#import requests
 from ast import literal_eval
 from urllib.parse import unquote
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-import os
+#import os
 
 
-def set_home_page_variables(posts, number=1, ):
+def set_home_page_variables(posts, user, number=1):
     home_page_dict = {}
     if posts:
         json_serializer = serializers.get_serializer("json")()
         markers_json = json_serializer.serialize(posts  , ensure_ascii=False)
 
-        user_names  = [ u.user.username for u in posts ]
-        image_urls  = [ i.user.profile.image.url for i in posts ]
+        user_names  = [ p.user.username for p in posts ]
         user_names_json =  json.dumps(user_names, cls=DjangoJSONEncoder)
+
+        image_urls  = [ p.user.profile.image.url for p in posts ]
         image_urls_json =  json.dumps(image_urls, cls=DjangoJSONEncoder)
+
+        ids = [ p.pk for p in posts ]
+        ids_json =  json.dumps(ids, cls=DjangoJSONEncoder)
+
+        num_likes = [Like.objects.filter(post=p).count() for p in posts]
+        num_likes_json = json.dumps(num_likes, cls=DjangoJSONEncoder)
+
+        liked = [0] * posts.count()
+        user_id = int(user.id)
+        for i, p in enumerate(posts):
+            likes = Like.objects.filter(post=p).values()
+            for l in likes:
+                if user_id == l['user_id']: liked[i] = 1
+        liked_json = json.dumps(liked, cls=DjangoJSONEncoder) 
 
         posts_list = posts.values()
         datetimes  = [ d['dateNtime'] for d in posts_list ]
@@ -36,6 +51,9 @@ def set_home_page_variables(posts, number=1, ):
         home_page_dict = {'markers_json': markers_json,
                           'user_names'  : user_names_json,
                           'image_urls'  : image_urls_json,
+                          'ids'         : ids_json,
+                          'num_likes'   : num_likes_json,
+                          'liked'       : liked_json,
                           'min_datetime': min_datetime_json,
                           'max_datetime': max_datetime_json,
                           'number'      : number}
@@ -45,8 +63,7 @@ def set_home_page_variables(posts, number=1, ):
 def get_latest_markers(requests):
     user = requests.user
     posts = Post.objects.exclude(user=user).filter(dateNtime__lte=datetime.now()).order_by('-dateNtime')[:1]
-    #posts = Post.objects.exclude(user=user).order_by('-dateNtime')[:1]
-    home_page_vars = set_home_page_variables(posts)
+    home_page_vars = set_home_page_variables(posts, user)
     return JsonResponse(home_page_vars)
 
 
@@ -77,12 +94,12 @@ def homepage(requests):
             #if number == 1:
             #    home_page_vars = set_home_page_variables(posts)
             #else:
-            home_page_vars = set_home_page_variables(posts, number)
+            home_page_vars = set_home_page_variables(posts, user, number)
             return JsonResponse(home_page_vars)
 
         else:       # first time homepage load
             posts = Post.objects.exclude(user=user).order_by('-dateNtime')[:2]
-            home_page_vars = set_home_page_variables(posts, 1)
+            home_page_vars = set_home_page_variables(posts, user, 1)
             return render(requests, 'map.html', home_page_vars)
     else:
         return redirect('login')
@@ -137,7 +154,7 @@ def SaveMarker1(request):
     if request.POST.get('file_data') == 'false':
         # user is redirected to the profile after adding a post (marker)
         user_posts = Post.objects.filter(dateNtime__lte=datetime.now(), user=request.user).order_by('-dateNtime')[:1]
-        home_page_vars = set_home_page_variables(user_posts)
+        home_page_vars = set_home_page_variables(user_posts, request.user)
         return JsonResponse(home_page_vars)
 
     return HttpResponse('')
@@ -150,18 +167,32 @@ def SaveMarker2(request):
 
     # user is redirected to the profile after adding a post (marker)
     user_posts = Post.objects.filter(dateNtime__lte=datetime.now(), user=request.user).order_by('-dateNtime')[:1]
-    home_page_vars = set_home_page_variables(user_posts)
+    home_page_vars = set_home_page_variables(user_posts, request.user)
     return JsonResponse(home_page_vars)
 ################################################################################
 
+def likeMarker(request):
+    post = Post.objects.get(pk=request.POST.get('pk'))
+    liked = Like.objects.filter(user=request.user, post=post)
+    if liked:
+        liked.delete()
+        flag = 0
+    else:
+        liked = Like(user=request.user, post=post)
+        liked.save()
+        flag = 1
+    num_likes = Like.objects.filter(post=post).count()
+    return JsonResponse({'num_likes': num_likes, 'flag': flag})
+
 def deleteMarker(request):
+    """deletes the marker from the database"""
     user = request.user
     date = request.POST.get('date')
     post = Post.objects.filter(dateNtime__gte=date, user=user).first()
     post.delete()
 
     user_posts = user.post_set.order_by('-dateNtime')[:1]
-    user_posts = set_home_page_variables(user_posts)
+    user_posts = set_home_page_variables(user_posts, user)
     return JsonResponse(user_posts)
 
 # no searching for posts at the moment!

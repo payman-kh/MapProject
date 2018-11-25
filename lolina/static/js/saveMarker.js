@@ -83,7 +83,7 @@ $(document).on('submit', '#add_marker_form', function(event){
                    new_min_datetime = data.min_datetime;
                    new_max_datetime = data.max_datetime;
                    readNDisplayMarkers(JSON.parse(data.markers_json), data.number, JSON.parse(data.user_names),
-                    JSON.parse(data.image_urls));
+                    JSON.parse(data.image_urls), JSON.parse(data.ids), JSON.parse(data.num_likes), JSON.parse(data.liked));
                },
                error: function(err){
                  console.log(err);
@@ -95,7 +95,7 @@ $(document).on('submit', '#add_marker_form', function(event){
             new_min_datetime = data.min_datetime;
             new_max_datetime = data.max_datetime;
             readNDisplayMarkers(JSON.parse(data.markers_json), data.number, JSON.parse(data.user_names),
-             JSON.parse(data.image_urls));
+             JSON.parse(data.image_urls), JSON.parse(data.ids), JSON.parse(data.num_likes), JSON.parse(data.liked));
         }
 
         //redirect to user profile

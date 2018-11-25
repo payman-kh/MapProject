@@ -15,6 +15,9 @@ textarea { display:block }
 #map {  height: 100%; }
 /* --------------------------------------------*/
 
+/*------------Google maps' infowindow-----------*/
+.gm-style-iw {}
+/*----------------------------------------------*/
 
 /*------------ add new marker form -------------------*/
 .btn-default{
@@ -33,7 +36,6 @@ textarea { display:block }
 
 .material-icons.md-18 { font-size: 18px; } /* upload button*/
 .material-icons.md-10 { font-size: 10px; } /* upload button*/
-
 /*---------------end of add new marker form ---------------------*/
 
 /*-----------------thumbnail------------------*/
@@ -57,10 +59,10 @@ textarea { display:block }
 }
 
 #like_button, #share_button, #get_directions{
-  color: blue;
+  color: grey;
   border: none;
   background-color: aqua;
-  border: 1px solid navy;
+  /*border: 1px solid navy;*/
   border-radius: 5px;
 }
 

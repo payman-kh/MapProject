@@ -1,14 +1,15 @@
-function readNDisplayMarkers(markers_from_database, number, user_names, image_urls){
+function readNDisplayMarkers(markers_from_database, number, user_names, image_urls, ids, num_likes, liked){
   // store the markers
   markers = [];
   marker_location = [];
-  dateNtimes = []
+  dateNtimes = [];
+
   //infowindows = new Array();
   //var main_content = new Array();
   var bounds  = new google.maps.LatLngBounds();   // store coords for auto-zoom and auto-center
   var endpoint = markers_from_database.length;
 
-  if (number== 1){
+  if (number == 1){
     markers_from_database[1] = []
     endpoint = 1;
   }
@@ -16,8 +17,6 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
   //the blue marker icon
   var marker_icon = new google.maps.MarkerImage("http://maps.google.com/mapfiles/ms/micons/blue.png",
              new google.maps.Size(32, 32), new google.maps.Point(0, 0),new google.maps.Point(16, 32));
-
-
 
   // display markers one by one
   for(m=0; m<endpoint; m++){
@@ -125,15 +124,20 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
               main_content = '<h4 style="background-color:Bisque;">'+ user_name +' was here!</h4><br>' + main_content;
           }
 
-          main_content = main_content +
-                          '<div class="marker_buttons" role="toolbar">' +
-                            '<br><br><button id="like_button" type="button" class="btn btn-default" title="like (inactive)"><span class="glyphicon glyphicon-thumbs-up"></span></button>&nbsp' +
-                            '<button id="share_button" class="btn btn-default" type="button" onclick="" title="share (inactive)"><span class="glyphicon glyphicon-share-alt"></span></button>&nbsp' +
-                            '<button id="get_directions" class="btn btn-default" type="button" onclick="get_directions()" title="get directions"> <i class="material-icons" style="font-size:27px;color:red">place</i> </button> &nbsp' +
-                            (on_profile == true ? '<button id="delete_marker" class="btn btn-default" type="button" onclick="deleteMarker('+ dateNtimes[m] +')" title="delete this marker" style="background-color:Lavender; border:1px Solid black;"><span class="glyphicon glyphicon-trash"></span></button>':"") +
-                            '<br><input id="new_comment" title="inactive" class="new_comment" type=input placeholder="write a comment...">' +
-                          '</div>';
-                          //'<br> <strong> Coordinates:&nbsp; </strong>' + lat + '<strong>,&nbsp;</strong> ' + lng + '<br><br>'
+          main_content =  main_content +
+                              '<br><br><h5><div id="num_likes">'+ num_likes[m] +' Likes</div></h5>' +
+                              '<div class="marker_buttons" role="toolbar">' +
+                                '<button id="like_button" type="button" class="btn btn-default" title="like this marker" onclick="likeMarker('+ ids[m] +')"' +
+                                (liked[m] == 0 ? 'style="color:grey;"':'style="color:blue;"') +
+                                '><span class="glyphicon glyphicon-thumbs-up"></span></button>&nbsp' +
+                                '<button id="share_button" class="btn btn-default" type="button" onclick="" title="share (inactive)"><span class="glyphicon glyphicon-share-alt"></span></button>&nbsp' +
+                                '<button id="get_directions" class="btn btn-default" type="button" onclick="get_directions()" title="get directions"> <i class="material-icons" style="font-size:27px;color:red; background-color:transparent;">place</i> </button> &nbsp' +
+                                (on_profile == true ? '<button id="delete_marker" class="btn btn-default" type="button" onclick="deleteMarker('+ dateNtimes[m] +')" title="delete this marker" style="background-color:aqua; color:grey; border:none;"><span class="glyphicon glyphicon-trash"></span></button>':"") +
+                                '<br><input id="new_comment" title="inactive" class="new_comment" type=input placeholder="write a comment...">' +
+                              '</div>'
+                            //'<br> <strong> Coordinates:&nbsp; </strong>' + lat + '<strong>,&nbsp;</strong> ' + lng + '<br><br>'
+
+
 
           //store and display thumbnail
           markers[m].thumbnail = new google.maps.InfoWindow({
@@ -159,9 +163,10 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
       map.fitBounds(bounds);
     }   //auto-zoom
     else {
-       map.setCenter(new google.maps.LatLng(lat, lng));
+       let newlat = lat - (-4);
+       map.setCenter(new google.maps.LatLng(newlat, lng));
        var listener = google.maps.event.addListener(map, "idle", function() {
-         map.setZoom(7);
+         map.setZoom(6);
          google.maps.event.removeListener(listener);
        });
       }  // center
@@ -218,7 +223,7 @@ function deleteMarker(date){
        new_min_datetime = data.min_datetime;
        new_max_datetime = data.max_datetime;
        readNDisplayMarkers(JSON.parse(data.markers_json), data.number, JSON.parse(data.user_names),
-                           JSON.parse(data.image_urls));
+        JSON.parse(data.image_urls), JSON.parse(data.ids), JSON.parse(data.num_likes), JSON.parse(data.liked));
      },
      error: function(err){
        console.log(err);
