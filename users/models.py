@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from PIL import Image
 
 
+# once a user registers, an instance of this profile class is made for it
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')

@@ -46,6 +46,8 @@ urlpatterns = [
     path('saveMarker2/', views.SaveMarker2, name='SaveMarker2'),
     # like a marker
     path('likeMarker/', views.likeMarker, name='LikeMarker'),
+    # comment a marker
+    path('commentMarker/', views.commentMarker, name='CommentMarker'),
     # delete a marker
     path('deleteMarker/', views.deleteMarker, name='DeleteMarker'),
 

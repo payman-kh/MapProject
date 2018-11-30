@@ -4,6 +4,8 @@ from django.dispatch import receiver
 from .models import Profile
 
 
+# once a user registers, a profile is made for it and is saved to the database
+# these functions trigger once a new user is created
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:

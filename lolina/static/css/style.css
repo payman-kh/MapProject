@@ -48,14 +48,14 @@ textarea { display:block }
 
 /*-------------- opened marker -------------*/
 .new_comment{
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
+  padding: 10px 10px;
+  margin: 0px 0px;
   display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 150%;
+  font-size: 90%;
+  align: center;
 }
 
 #like_button, #share_button, #get_directions{
@@ -64,6 +64,7 @@ textarea { display:block }
   background-color: aqua;
   /*border: 1px solid navy;*/
   border-radius: 5px;
+  outline: none;
 }
 
 #get_directions{
@@ -72,8 +73,6 @@ textarea { display:block }
   padding-top: 2px;
   padding-bottom: 1px;
 }
-
-#marker_body{}
 /* --------- end of opened marker -------------*/
 
 

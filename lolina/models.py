@@ -35,12 +35,14 @@ class Like(models.Model):
         return '%s %s %s' % (self.post.title, ':' ,self.user.username)
 
 
-"""class Comment(models.Models):
-    #Comments on a Marker
+class Comment(models.Model):
+    """ Comments on a Marker """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    body = models.TextField(default='') """
+    body = models.TextField(default=None)
 
+    def __str__(self):
+        return '%s %s %s' % (self.post.title, ':' ,self.user.username)
 
 #this was used when searched for a marker
 """class SearchQueries(models.Model):

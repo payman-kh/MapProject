@@ -133,7 +133,13 @@ function readNDisplayMarkers(markers_from_database, number, user_names, image_ur
                                 '<button id="share_button" class="btn btn-default" type="button" onclick="" title="share (inactive)"><span class="glyphicon glyphicon-share-alt"></span></button>&nbsp' +
                                 '<button id="get_directions" class="btn btn-default" type="button" onclick="get_directions()" title="get directions"> <i class="material-icons" style="font-size:27px;color:red; background-color:transparent;">place</i> </button> &nbsp' +
                                 (on_profile == true ? '<button id="delete_marker" class="btn btn-default" type="button" onclick="deleteMarker('+ dateNtimes[m] +')" title="delete this marker" style="background-color:aqua; color:grey; border:none;"><span class="glyphicon glyphicon-trash"></span></button>':"") +
-                                '<br><input id="new_comment" title="inactive" class="new_comment" type=input placeholder="write a comment...">' +
+                                '<br><h5>0 comments</h5>'+
+                                '<br><form id="comment" onsubmit="commentMarker('+ ids[m] +')" autocomplete="off">' +
+                                  '<div id="" class="form-group" style="width: 100%">' +
+                                    '<input id="new_comment" title="write a comment" class="new_comment" type="text" placeholder="write a comment..." style="width:90%; background-color:LightCyan;">' +
+                                    '<input id="new_comment_submit" type="submit"  class="new_comment"  title="submit this comment" value="Submit" style="color:black; background-color:LightCyan; width:10%;">' +  //<span class="glyphicon glyphicon-ok"></span>
+                                  '</div>' +
+                                '</form>' +
                               '</div>'
                             //'<br> <strong> Coordinates:&nbsp; </strong>' + lat + '<strong>,&nbsp;</strong> ' + lng + '<br><br>'
 

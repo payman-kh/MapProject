@@ -19,6 +19,7 @@
  <script type="text/javascript" src="{% static 'js/closeAll.js' %}"></script>
  <script type="text/javascript" src="{% static 'js/addMarkerToCurrentLocation.js' %}"></script>
  <script type="text/javascript" src="{% static 'js/likeMarker.js' %}"></script>
+ <script type="text/javascript" src="{% static 'js/commentMarker.js' %}"></script>
  <!--<script type="text/javascript" src="{% static 'js/drawCircle.js' %}"></script>-->
  <!--<script type="text/javascript" src="{% static 'js/shareMarker.js' %}"></script>-->
 
@@ -42,14 +43,14 @@
   <!-- storing the context variables for first time load (they are read only once!)-->
   <div style="display:none">
      <meta name="markers_from_database" id="markers_from_database" data-name="{{markers_json}}">
-     <meta name="user_names" id="user_names" data-name="{{user_names}}">
-     <meta name="image_urls" id="image_urls" data-name="{{image_urls}}">
-     <meta name="ids" id="ids" data-name="{{ids}}">
-     <meta name="num_likes" id="num_likes" data-name="{{num_likes}}">
-     <meta name="liked" id="liked" data-name="{{liked}}">     
-     <meta name="min_datetime" id="min_datetime" data-name="{{min_datetime}}">
-     <meta name="max_datetime" id="max_datetime" data-name="{{max_datetime}}">
-     <meta name="number" id="number" data-name="{{number}}">
+     <meta name="user_names"            id="user_names"            data-name="{{user_names}}">
+     <meta name="image_urls"            id="image_urls"            data-name="{{image_urls}}">
+     <meta name="ids"                   id="ids"                   data-name="{{ids}}">
+     <meta name="num_likes"             id="num_likes"             data-name="{{num_likes}}">
+     <meta name="liked"                 id="liked"                 data-name="{{liked}}">
+     <meta name="min_datetime"          id="min_datetime"          data-name="{{min_datetime}}">
+     <meta name="max_datetime"          id="max_datetime"          data-name="{{max_datetime}}">
+     <meta name="number"                id="number"                data-name="{{number}}">
   </div>
 
   <!-- marker option menu -->
@@ -183,7 +184,6 @@
   <!------------------------------------------------------------------------>
 
 <script>
-//---------------------------- INITIALIZE THE MAP ------------------------------
 var map;
 var temp_marker = null;
 var lat, lng;
@@ -221,7 +221,6 @@ function initMap(){
   //the map instance
   map = new google.maps.Map(document.getElementById('map'), options);
 
-
   // base directory of icon markers
   //var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
 
@@ -230,7 +229,6 @@ function initMap(){
              new google.maps.Size(32, 32), new google.maps.Point(0, 0),new google.maps.Point(16, 32));
   //blue marekr used in engines.google.com:
   //https://mt.google.com/vt/icon/name=icons/onion/SHARED-mymaps-pin-container-bg_4x.png,icons/onion/SHARED-mymaps-pin-container_4x.png,icons/onion/1899-blank-shape_pin_4x.png&amp;highlight=ff000000,0288D1,ff000000&amp;scale=2.0
-
 
 //-----------------------------------------------------------------------------
  // Listener for per-click markers:
@@ -395,7 +393,6 @@ function congrates(){
 }
 //-----------------------------------------------------------------------------
 function add_marker(){
-
   temp_marker.newWindow.close();
 
   var form_1 =	$("#iw-add_marker").clone().show();
